@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bifid Cipher Chi-Squared Calculator</title>
+</head>
+<body>
+    <h1>Bifid Cipher Chi-Squared Calculator</h1>
+
+    <form id="bifidForm">
+        <label for="cipherText">Enter Bifid Cipher Text:</label><br>
+        <textarea id="cipherText" rows="6" cols="50"></textarea><br><br>
+        <button type="button" onclick="calculateChiSquared()">Calculate Chi-Squared</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        function calculateChiSquared() {
+            const text = document.getElementById('cipherText').value.replace(/[^A-Za-z]/g, '').toUpperCase();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            for (let period = 1; period <= text.length; period++) {
+                const chiSquared = calculateChiSquaredForPeriod(text, period);
+                resultsDiv.innerHTML += `Period ${period}: χ² = ${chiSquared.toFixed(2)}<br>`;
+            }
+        }
+
+        function calculateChiSquaredForPeriod(text, period) {
+            let frequencies = new Array(26).fill(0);
+            const expectedFreq = [0.082, 0.015, 0.028, 0.043, 0.127, 0.022, 0.020, 0.061, 0.070, 0.002, 0.008, 0.040, 0.024, 0.067, 0.075, 0.019, 0.001, 0.060, 0.063, 0.091, 0.028, 0.010, 0.023, 0.001, 0.020, 0.001]; // English letter frequencies
+
+            for (let i = 0; i < text.length; i += period) {
+                const letterIndex = text.charCodeAt(i) - 65; // Convert A-Z to 0-25
+                if (letterIndex >= 0 && letterIndex < 26) {
+                    frequencies[letterIndex]++;
+                }
+            }
+
+            let chiSquared = 0;
+            const n = Math.floor(text.length / period); // Number of letters considered
+
+            for (let i = 0; i < 26; i++) {
+                const observed = frequencies[i];
+                const expected = n * expectedFreq[i];
+                chiSquared += Math.pow(observed - expected, 2) / expected;
+            }
+
+            return chiSquared;
+        }
+    </script>
+</body>
+</html>
